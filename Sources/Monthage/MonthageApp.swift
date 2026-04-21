@@ -6,8 +6,7 @@ struct MonthageApp: App {
         MenuBarExtra {
             MenuContent()
         } label: {
-            // Custom text label for menubar
-            Text("📅 \(calculateMonthPercentage())%")
+            Text("📅 \(MonthCalculator().calculatePercentage())%")
                 .font(.system(.body, design: .monospaced))
         }
         .menuBarExtraStyle(.menu)
@@ -15,15 +14,17 @@ struct MonthageApp: App {
 }
 
 struct MenuContent: View {
+    private let calculator = MonthCalculator()
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Mes: \(currentMonthName())")
+            Text("Mes: \(calculator.currentMonthName())")
                 .font(.headline)
             
             Divider()
             
-            Text("Progreso: \(calculateMonthPercentage())%")
-            Text("Días restantes: \(daysRemaining())")
+            Text("Progreso: \(calculator.calculatePercentage())%")
+            Text("Días restantes: \(calculator.daysRemaining())")
             
             Divider()
             
@@ -34,39 +35,4 @@ struct MenuContent: View {
         }
         .padding()
     }
-}
-
-func calculateMonthPercentageText() -> String {
-    "\(calculateMonthPercentage())%"
-}
-
-func calculateMonthPercentage() -> Int {
-    let calendar = Calendar.current
-    let now = Date()
-    
-    guard let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)),
-          let startOfNextMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth) else {
-        return 0
-    }
-    
-    let totalSeconds = startOfNextMonth.timeIntervalSince(startOfMonth)
-    let elapsedSeconds = now.timeIntervalSince(startOfMonth)
-    
-    guard totalSeconds > 0 else { return 0 }
-    return Int((elapsedSeconds / totalSeconds) * 100)
-}
-
-func daysRemaining() -> Int {
-    let calendar = Calendar.current
-    let now = Date()
-    guard let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)),
-          let startOfNextMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth) else { return 0 }
-    return calendar.dateComponents([.day], from: now, to: startOfNextMonth).day ?? 0
-}
-
-func currentMonthName() -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "es_ES")
-    formatter.dateFormat = "MMMM yyyy"
-    return formatter.string(from: Date()).capitalized
 }
