@@ -1,0 +1,9 @@
+.build/
+*.xcodeproj
+*.xcworkspace
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
