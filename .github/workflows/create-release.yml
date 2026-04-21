@@ -1,4 +1,4 @@
-name: Create Release
+name: Create Release and Update Cask
 
 on:
   push:
@@ -6,17 +6,19 @@ on:
       - 'v*'
 
 jobs:
-  build-and-release:
+  release-and-update-cask:
     runs-on: macos-latest
     permissions:
       contents: write
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get version from tag
       id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
 
     - name: Build Release
       run: swift build -c release
@@ -32,6 +34,12 @@ jobs:
     - name: Package App
       run: zip -r Monthage.app.zip Monthage.app
 
+    - name: Calculate SHA256
+      id: sha
+      run: |
+        SHA256=$(shasum -a 256 Monthage.app.zip | awk '{ print $1 }')
+        echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
@@ -40,3 +48,34 @@ jobs:
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update Cask File
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        SHA256="${{ steps.sha.outputs.sha256 }}"
+        
+        echo 'cask "monthage" do' > Casks/monthage.rb
+        echo "  version \"$VERSION\"" >> Casks/monthage.rb
+        echo "  sha256 \"$SHA256\"" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  url \"https://github.com/aarizkuren/monthage/releases/download/v#{version}/Monthage.app.zip\"" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  name \"Monthage\"" >> Casks/monthage.rb
+        echo "  desc \"Menubar app showing month progress percentage\"" >> Casks/monthage.rb
+        echo "  homepage \"https://github.com/aarizkuren/monthage\"" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  livecheck do" >> Casks/monthage.rb
+        echo "    url :url" >> Casks/monthage.rb
+        echo "    strategy :github_latest" >> Casks/monthage.rb
+        echo "  end" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  app \"Monthage.app\"" >> Casks/monthage.rb
+        echo "end" >> Casks/monthage.rb
+
+    - name: Commit Updated Cask
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add Casks/monthage.rb
+        git commit -m "chore: update cask to version ${{ steps.get_version.outputs.VERSION }}"
+        git push
