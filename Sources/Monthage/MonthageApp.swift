@@ -18,7 +18,7 @@ struct MenuContent: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Month: \(calculator.currentMonthName())")
+            Text("\(calculator.currentMonthName())")
                 .font(.headline)
             
             Divider()
