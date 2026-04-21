@@ -18,17 +18,17 @@ struct MenuContent: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Mes: \(calculator.currentMonthName())")
+            Text("Month: \(calculator.currentMonthName())")
                 .font(.headline)
             
             Divider()
             
-            Text("Progreso: \(calculator.calculatePercentage())%")
-            Text("Días restantes: \(calculator.daysRemaining())")
+            Text("Progress: \(calculator.calculatePercentage())%")
+            Text("Days remaining: \(calculator.daysRemaining())")
             
             Divider()
             
-            Button("Salir") {
+            Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")

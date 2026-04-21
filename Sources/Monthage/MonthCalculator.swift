@@ -46,11 +46,11 @@ struct MonthCalculator {
         return calendar.dateComponents([.day], from: currentDate, to: startOfNextMonth).day ?? 0
     }
     
-    /// Returns the formatted current month name (e.g., "Enero 2026")
+    /// Returns the formatted current month name (uses system locale)
     func currentMonthName() -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "es_ES")
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: currentDate).capitalized
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter.string(from: currentDate)
     }
 }
