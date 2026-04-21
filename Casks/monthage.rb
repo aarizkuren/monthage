@@ -1,6 +1,6 @@
 cask "monthage" do
-  version "1.0.0"
-  sha256 :no_check
+  version "0.3.1"
+  sha256 "5c4f3918b64ca03f3a8d745b581dc7d05f2c5e02f878fb50ac55e8768c7d483b"
 
   url "https://github.com/aarizkuren/monthage/releases/download/v#{version}/Monthage.app.zip"
 
