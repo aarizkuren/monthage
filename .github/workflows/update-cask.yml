@@ -1,0 +1,62 @@
+name: Update Cask on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-cask:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get Release Info
+      id: release
+      run: |
+        VERSION="${{ github.event.release.tag_name }}"
+        VERSION="${VERSION#v}"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: Download Release Asset
+      run: |
+        curl -L -o Monthage.app.zip "https://github.com/aarizkuren/monthage/releases/download/v${{ steps.release.outputs.version }}/Monthage.app.zip"
+
+    - name: Calculate SHA256
+      id: sha
+      run: |
+        SHA256=$(shasum -a 256 Monthage.app.zip | awk '{ print $1 }')
+        echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+
+    - name: Generate Cask File
+      run: |
+        VERSION="${{ steps.release.outputs.version }}"
+        SHA256="${{ steps.sha.outputs.sha256 }}"
+        
+        echo "cask \"monthage\" do" > Casks/monthage.rb
+        echo "  version \"$VERSION\"" >> Casks/monthage.rb
+        echo "  sha256 \"$SHA256\"" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  url \"https://github.com/aarizkuren/monthage/releases/download/v#{version}/Monthage.app.zip\"" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  name \"Monthage\"" >> Casks/monthage.rb
+        echo "  desc \"Menubar app showing month progress percentage\"" >> Casks/monthage.rb
+        echo "  homepage \"https://github.com/aarizkuren/monthage\"" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  livecheck do" >> Casks/monthage.rb
+        echo "    url :url" >> Casks/monthage.rb
+        echo "    strategy :github_latest" >> Casks/monthage.rb
+        echo "  end" >> Casks/monthage.rb
+        echo "" >> Casks/monthage.rb
+        echo "  app \"Monthage.app\"" >> Casks/monthage.rb
+        echo "end" >> Casks/monthage.rb
+
+    - name: Commit and Push
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add Casks/monthage.rb
+        git commit -m "chore: update cask to version ${{ steps.release.outputs.version }}"
+        git push
