@@ -1,47 +1,54 @@
 # 📅 Monthage
 
-Una pequeña app para macOS que muestra en la barra de menú qué porcentaje del mes ha transcurrido.
+A tiny macOS menubar app that shows what percentage of the current month has elapsed.
 
 ![Monthage Screenshot](screenshot.png)
 
-## ¿Por qué?
+## Why?
 
-Para saber cómo vas de tiempo vs. tu consumo de suscripciones (IA, datos, etc.). Si has consumido el 60% de tu cuota y estás en el 82% del mes... vas justo.
+To track time vs. your subscription usage (AI, data, etc.). If you've used 60% of your quota and you're at 82% of the month... you're cutting it close.
 
-## Requisitos
+## Requirements
 
-- macOS 13.0 o superior
+- macOS 13.0+
 
-## Instalación
+## Installation
 
-### Opción 1: Descargar release
-
-1. Ve a [Releases](../../releases) y descarga el último `Monthage.app.zip`
-2. Descomprime y arrastra `Monthage.app` a Aplicaciones
-3. Si macOS bloquea la app: Preferencias del Sistema → Privacidad → Permitir
-
-### Opción 2: Compilar desde código
+### Option 1: Homebrew (Recommended)
 
 ```bash
-git clone https://github.com/tuusuario/monthage.git
+brew tap aarizkuren/monthage
+brew install --cask monthage
+```
+
+### Option 2: Download Release
+
+1. Go to [Releases](../../releases) and download the latest `Monthage.app.zip`
+2. Unzip and drag `Monthage.app` to Applications
+3. If macOS blocks it: System Preferences → Privacy & Security → Allow
+
+### Option 3: Build from Source
+
+```bash
+git clone https://github.com/aarizkuren/monthage.git
 cd monthage
 swift build -c release
 open .build/release/Monthage
 ```
 
-## Uso
+## Usage
 
-- El icono aparece en la barra de menú: `📅 67%`
-- Click para ver: mes actual, % transcurrido, días restantes
-- Cmd+Q para salir
+- Icon appears in menubar: `📅 67%`
+- Click to see: current month, % elapsed, days remaining
+- Cmd+Q to quit
 
-## Características
+## Features
 
-- Actualiza cada hora automáticamente
-- Sin icono en el dock (solo menú)
+- Auto-updates every hour
+- No dock icon (menubar only)
 - Dark mode compatible
-- Lista para futuras integraciones con APIs (Anthropic, OpenAI, etc.)
+- Ready for future API integrations (Anthropic, OpenAI, etc.)
 
-## Licencia
+## License
 
-MIT © [Tu Nombre](https://github.com/tuusuario)
+MIT © [aarizkuren](https://github.com/aarizkuren)
