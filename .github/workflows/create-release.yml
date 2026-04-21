@@ -1,0 +1,40 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Build Release
+      run: swift build -c release
+
+    - name: Create App Bundle
+      run: |
+        mkdir -p Monthage.app/Contents/MacOS
+        mkdir -p Monthage.app/Contents/Resources
+        cp .build/release/Monthage Monthage.app/Contents/MacOS/
+        cp Resources/Info.plist Monthage.app/Contents/
+        chmod +x Monthage.app/Contents/MacOS/Monthage
+
+    - name: Package App
+      run: zip -r Monthage.app.zip Monthage.app
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: "Release ${{ steps.get_version.outputs.VERSION }}"
+        files: Monthage.app.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
