@@ -1,0 +1,72 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Tests
+      run: swift test
+
+  build:
+    runs-on: macos-latest
+    needs: test
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Release
+      run: swift build -c release
+    
+    - name: Create App Bundle
+      run: |
+        mkdir -p Monthage.app/Contents/MacOS
+        mkdir -p Monthage.app/Contents/Resources
+        cp .build/release/Monthage Monthage.app/Contents/MacOS/
+        cp Resources/Info.plist Monthage.app/Contents/
+        chmod +x Monthage.app/Contents/MacOS/Monthage
+    
+    - name: Package App
+      run: zip -r Monthage.app.zip Monthage.app
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Monthage.app
+        path: Monthage.app.zip
+
+  release:
+    runs-on: macos-latest
+    needs: [test, build]
+    if: github.event_name == 'release'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Release
+      run: swift build -c release
+    
+    - name: Create App Bundle
+      run: |
+        mkdir -p Monthage.app/Contents/MacOS
+        mkdir -p Monthage.app/Contents/Resources
+        cp .build/release/Monthage Monthage.app/Contents/MacOS/
+        cp Resources/Info.plist Monthage.app/Contents/
+        chmod +x Monthage.app/Contents/MacOS/Monthage
+    
+    - name: Package for Release
+      run: zip -r Monthage.app.zip Monthage.app
+    
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: Monthage.app.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
