@@ -22,17 +22,23 @@ jobs:
       run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
 
     - name: Build for Intel (x86_64)
-      run: swift build -c release --arch x86_64
+      run: |
+        swift build -c release --target Monthage -Xswiftc -target -Xswiftc x86_64-apple-macos13
+        mkdir -p .build/x86_64
+        cp .build/release/Monthage .build/x86_64/Monthage
 
     - name: Build for Apple Silicon (arm64)
-      run: swift build -c release --arch arm64
+      run: |
+        swift build -c release --target Monthage -Xswiftc -target -Xswiftc arm64-apple-macos13
+        mkdir -p .build/arm64
+        cp .build/release/Monthage .build/arm64/Monthage
 
     - name: Create Universal Binary
       run: |
         mkdir -p .build/universal
         lipo -create \
-          .build/release/Monthage \
-          .build/arm64-apple-macosx/release/Monthage \
+          .build/x86_64/Monthage \
+          .build/arm64/Monthage \
           -output .build/universal/Monthage
 
     - name: Create App Bundle
