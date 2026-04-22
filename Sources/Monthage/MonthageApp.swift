@@ -15,19 +15,24 @@ struct MonthageApp: App {
 
 struct MenuContent: View {
     private let calculator = MonthCalculator()
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("\(calculator.currentMonthName())")
                 .font(.headline)
-            
+
             Divider()
-            
+
             Text("Progress: \(calculator.calculatePercentage())%")
             Text("Days remaining: \(calculator.daysRemaining())")
-            
+
             Divider()
-            
+
+            Button(LaunchHelper.isEnabled ? "✅ Start at Login" : "Start at Login") {
+                LaunchHelper.toggle()
+            }
+            .keyboardShortcut("l")
+
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
