@@ -25,7 +25,11 @@ brew install --cask monthage
 
 1. Go to [Releases](../../releases) and download the latest `Monthage.app.zip`
 2. Unzip and drag `Monthage.app` to Applications
-3. If macOS blocks it: System Preferences → Privacy & Security → Allow
+3. If macOS shows "damaged": open Terminal and run:
+   ```bash
+   xattr -cr /Applications/Monthage.app
+   ```
+4. Open `Monthage.app`
 
 ### Option 3: Build from Source
 

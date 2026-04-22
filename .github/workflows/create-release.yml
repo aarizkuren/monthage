@@ -26,11 +26,7 @@ jobs:
 
     - name: Create App Bundle
       run: |
-        mkdir -p Monthage.app/Contents/MacOS
-        mkdir -p Monthage.app/Contents/Resources
-        cp .build/release/Monthage Monthage.app/Contents/MacOS/
-        cp Resources/Info.plist Monthage.app/Contents/
-        chmod +x Monthage.app/Contents/MacOS/Monthage
+        bash build-app-bundle.sh
 
     - name: Package App
       run: zip -r Monthage.app.zip Monthage.app

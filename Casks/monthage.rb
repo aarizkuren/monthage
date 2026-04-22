@@ -14,4 +14,10 @@ cask "monthage" do
   end
 
   app "Monthage.app"
+
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-cr", "#{appdir}/Monthage.app"],
+                   sudo: false
+  end
 end
