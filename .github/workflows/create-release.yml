@@ -21,14 +21,25 @@ jobs:
       id: get_version
       run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
 
-    - name: Build Release
-      run: swift build -c release
+    - name: Build for Intel (x86_64)
+      run: swift build -c release --arch x86_64
+
+    - name: Build for Apple Silicon (arm64)
+      run: swift build -c release --arch arm64
+
+    - name: Create Universal Binary
+      run: |
+        mkdir -p .build/universal
+        lipo -create \
+          .build/release/Monthage \
+          .build/arm64-apple-macosx/release/Monthage \
+          -output .build/universal/Monthage
 
     - name: Create App Bundle
       run: |
         mkdir -p Monthage.app/Contents/MacOS
         mkdir -p Monthage.app/Contents/Resources
-        cp .build/release/Monthage Monthage.app/Contents/MacOS/
+        cp .build/universal/Monthage Monthage.app/Contents/MacOS/
         cp Resources/Info.plist Monthage.app/Contents/
         chmod +x Monthage.app/Contents/MacOS/Monthage
 
